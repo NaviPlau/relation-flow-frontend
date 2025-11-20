@@ -1,0 +1,501 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f7fb;
+  color: #1f2933;
+}
+
+.app-root {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #ffffff;
+  border-right: 1px solid #e1e5ee;
+  padding: 0.75rem 0.75rem 1rem;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: 200ms ease-out;
+  border-radius: 12px;
+}
+
+.sidebar-collapsed {
+  width: 100px;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sidebar-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #243b53;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.nav-btn {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 12px 20px;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #52606d;
+  transition: background 0.15s ease-out, border-color 0.15s ease-out,
+    color 0.15s ease-out;
+}
+
+.nav-btn:hover {
+  background: #eef2ff;
+  color: #364152;
+}
+
+.nav-btn-active {
+  background: #e0ebff;
+  border-color: #b3c5ff;
+  color: #1f3b8e;
+  font-weight: 600;
+}
+
+.main-area {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+}
+
+.view-container {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+.panel {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e1e5ee;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #243b53;
+}
+
+button {
+  font-family: inherit;
+}
+
+.btn-primary {
+  border-radius: 999px;
+  border: none;
+  padding: 0.4rem 0.85rem;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease-out, box-shadow 0.15s ease-out,
+    transform 0.1s ease-out;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover {
+    background: #1d4ed8;
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-secondary {
+  border-radius: 999px;
+  border: 1px solid #cbd2e1;
+  padding: 0.35rem 0.75rem;
+  background: #ffffff;
+  color: #364152;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease-out, border-color 0.15s ease-out;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover {
+    background: #f3f4ff;
+    border-color: #9fb3ff;
+  }
+}
+
+.btn-ghost {
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  color: #7b8794;
+  cursor: pointer;
+  padding: 0.2rem 0.45rem;
+}
+
+.btn-ghost.small {
+  font-size: 28px;
+  color: red;
+}
+
+.list-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-list-item {
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  cursor: pointer;
+  margin-bottom: 0.35rem;
+  transition: background 0.12s ease-out, border-color 0.12s ease-out;
+}
+
+.contact-list-item:hover {
+  background: #f1f5fb;
+}
+
+.contact-list-item.active {
+  background: #e0ebff;
+  border-color: #b3c5ff;
+}
+
+.contact-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #243b53;
+}
+
+.contact-email {
+  font-size: 0.8rem;
+  color: #7b8794;
+}
+
+.contact-meta {
+  font-size: 0.7rem;
+  color: #9fb3c8;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.6rem 1rem;
+  margin-top: 0.4rem;
+}
+
+.detail-label {
+  font-size: 0.7rem;
+  color: #7b8794;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: #243b53;
+}
+
+.detail-full {
+  grid-column: 1 / -1;
+}
+
+.muted {
+  font-size: 0.85rem;
+  color: #9fb3c8;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e1e5ee;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+  padding: 0.85rem 1rem 1rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #243b53;
+}
+
+.modal-body {
+  margin-top: 0.7rem;
+}
+
+.form-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-vertical label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: #52606d;
+  text-align: left;
+  position: relative;
+}
+
+.form-vertical input,
+.form-vertical textarea,
+.form-vertical select {
+  border-radius: 8px;
+  border: 1px solid #cbd2e1;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.form-vertical textarea {
+  resize: vertical;
+  min-height: 80px;
+  max-height: 200px;
+}
+
+.modal-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.inline-contact-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inline-contact-row select {
+  flex: 1;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.calendar-month {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #243b53;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-weekday {
+  font-size: 0.7rem;
+  text-align: center;
+  color: #9fb3c8;
+}
+
+.calendar-day {
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #f9fbff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #52606d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.calendar-day:hover {
+  background: #e5edff;
+}
+
+.calendar-day-faded {
+  background: #f0f4fa;
+  color: #9fb3c8;
+}
+
+.calendar-day-today {
+  border-color: #2563eb;
+}
+
+.calendar-day-has {
+  background: #dde7ff;
+}
+
+.calendar-day-selected {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.calendar-day-past {
+  opacity: 0.4;
+  color: #9fb3ff;
+}
+
+.hover-card {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  background: #f9fbff;
+  border: 1px solid #e1e5ee;
+  font-size: 0.8rem;
+}
+
+.hover-card-title {
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.appointment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+}
+
+.appointment-item {
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #e1e5ee;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.appointment-time {
+  font-weight: 500;
+  color: #243b53;
+}
+
+.appointment-contact {
+  color: #364152;
+}
+
+.appointment-type {
+  color: #7b8794;
+  font-size: 0.75rem;
+}
+
+.appointment-note {
+  margin-top: 0.2rem;
+  color: #52606d;
+}
+
+.radio-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  cursor: pointer;
+}
+
+.field-error {
+  position: absolute;
+  top: 100%;
+  font-size: 0.8rem;
+  color: #c0392b;
+
+}
+.form-field{
+  text-align: left;
+  span{
+    font-size: 0.8rem;
+    color: #52606d;
+    text-align: left;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .view-container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main-area {
+    padding: 0.75rem;
+  }
+}
