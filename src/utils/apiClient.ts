@@ -1,7 +1,20 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
 
-const TENANT_SLUG = "sprintwave-digital";
+function resolveTenantSlug(): string {
+  if (typeof window === "undefined") {
+    return import.meta.env.VITE_TENANT_SLUG ?? "binarybridge-systems";
+  }
+  const url = new URL(window.location.href);
+  const fromQuery = url.searchParams.get("tenant");
+  if (fromQuery && fromQuery.trim()) {
+    return fromQuery.trim();
+  }
+
+  return "binarybridge-systems";
+}
+
+const TENANT_SLUG = resolveTenantSlug();
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
