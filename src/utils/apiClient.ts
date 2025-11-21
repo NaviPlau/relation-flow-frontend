@@ -5,13 +5,15 @@ function resolveTenantSlug(): string {
   if (typeof window === "undefined") {
     return import.meta.env.VITE_TENANT_SLUG ?? "binarybridge-systems";
   }
+
   const url = new URL(window.location.href);
   const fromQuery = url.searchParams.get("tenant");
+
   if (fromQuery && fromQuery.trim()) {
     return fromQuery.trim();
   }
 
-  return "binarybridge-systems";
+  return import.meta.env.VITE_TENANT_SLUG ?? "binarybridge-systems";
 }
 
 const TENANT_SLUG = resolveTenantSlug();
@@ -34,22 +36,38 @@ async function apiRequest<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
- if (!res.ok) {
-  let message = `API ${method} ${path} failed: ${res.status}`;
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!res.ok) {
+    let message = `API ${method} ${path} failed: ${res.status}`;
 
-  try {
-    const data = await res.json();
-    // DRF-Standard: { "detail": "..." }
-    if (data) {
-      message = data.detail;
+    try {
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        if (data && typeof (data as any).detail === "string") {
+          message = (data as any).detail;
+        }
+      } else {
+        const text = await res.text();
+        if (text) {
+          message = text.slice(0, 300);
+        }
+      }
+    } catch {
     }
-  } catch (err) {}
 
-  throw new Error(message);
-}
+    throw new Error(message);
+  }
+  if (res.status === 204) {
+    return undefined as T;
+  }
 
-  if (res.status === 204) return undefined as T;
-
+  if (!contentType.includes("application/json")) {
+    const text = await res.text();
+    console.error("API returned non-JSON response:", text);
+    throw new Error(
+      `API ${method} ${path} returned non-JSON response (status ${res.status}).`
+    );
+  }
   return (await res.json()) as T;
 }
 
