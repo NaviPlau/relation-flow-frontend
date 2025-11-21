@@ -11,8 +11,8 @@ import { validateContactForm } from "../utils/validateContactForm";
 
 interface ContactsViewProps {
   contacts: Contact[];
-  onCreateContact: (data: Omit<Contact, "id">) => Contact;
-  onUpdateContact: (contact: Contact) => void;
+  onCreateContact: (data: Omit<Contact, "id">) => Promise<Contact>;
+  onUpdateContact: (contact: Contact) => Promise<void>;
   onSelectContactForAppointment: (contact: Contact) => void;
 }
 
@@ -50,7 +50,7 @@ export function ContactsView({
     setModalMode("create");
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const nextErrors = validateContactForm(form);
@@ -61,7 +61,7 @@ export function ContactsView({
     }
 
     if (modalMode === "create") {
-      const contact = onCreateContact({
+      const contact = await onCreateContact({
         name: form.name.trim(),
         email: form.email.trim(),
         note: form.note.trim() || undefined,
@@ -73,7 +73,7 @@ export function ContactsView({
     }
 
     if (modalMode === "edit" && selectedContact) {
-      const updated = {
+      const updated: Contact = {
         ...selectedContact,
         name: form.name.trim(),
         email: form.email.trim(),
@@ -81,7 +81,7 @@ export function ContactsView({
         address: form.address.trim() || undefined,
         note: form.note.trim() || undefined,
       };
-      onUpdateContact(updated);
+      await onUpdateContact(updated);
     }
 
     setModalMode(null);

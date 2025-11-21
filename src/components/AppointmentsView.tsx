@@ -16,10 +16,10 @@ import { isPastDate } from "../utils/date";
 interface AppointmentsViewProps {
   contacts: Contact[];
   appointments: Appointment[];
-  onCreateAppointment: (data: Omit<Appointment, "id">) => Appointment;
-  onUpdateAppointment: (appointment: Appointment) => void;
-  onDeleteAppointment: (id: number) => void;
-  onCreateContactInline: (data: Omit<Contact, "id">) => Contact;
+  onCreateAppointment: (data: Omit<Appointment, "id">) => Promise<Appointment>;
+  onUpdateAppointment: (appointment: Appointment) => Promise<void>;
+  onDeleteAppointment: (id: number) => Promise<void>;
+  onCreateContactInline: (data: Omit<Contact, "id">) => Promise<Contact>;
   preselectedContactId: number | null;
   onClearPreselectedContact: () => void;
 }
@@ -59,7 +59,8 @@ export function AppointmentsView({
 
   const [isNewContactModalOpen, setIsNewContactModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [inlineContactErrors, setInlineContactErrors] = useState<ContactFormErrors>({});
+  const [inlineContactErrors, setInlineContactErrors] =
+    useState<ContactFormErrors>({});
   const isSelectedDateInPast = selectedDate ? isPastDate(selectedDate) : false;
   const [contactForm, setContactForm] = useState<ContactFormState>({
     name: "",
@@ -69,14 +70,15 @@ export function AppointmentsView({
     note: "",
   });
 
-  const handleCreateContactInline = (e: React.FormEvent) => {
+  const handleCreateContactInline = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const nextErrors = validateContactForm(contactForm);
     setInlineContactErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) return;
-    const contact = onCreateContactInline({
+
+    const contact = await onCreateContactInline({
       name: contactForm.name.trim(),
       email: contactForm.email.trim(),
       note: contactForm.note.trim() || undefined,
@@ -144,6 +146,7 @@ export function AppointmentsView({
         onClose={() => setMode(null)}
         errors={formErrors}
       />
+
       <ContactFormModal
         isOpen={isNewContactModalOpen}
         mode="create"
@@ -161,9 +164,9 @@ export function AppointmentsView({
         isOpen={isDeleteConfirmOpen}
         emailLocked={emailLocked}
         onClose={() => setIsDeleteConfirmOpen(false)}
-        onConfirmDelete={() => {
+        onConfirmDelete={async () => {
           if (editingId != null) {
-            onDeleteAppointment(editingId);
+            await onDeleteAppointment(editingId);
           }
           setIsDeleteConfirmOpen(false);
           setMode(null);

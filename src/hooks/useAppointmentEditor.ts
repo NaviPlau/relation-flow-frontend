@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import type {
-  Appointment, Contact,
-  AppointmentFormErrors, AppointmentFormState,
-  Mode
+  Appointment,
+  Contact,
+  AppointmentFormErrors,
+  AppointmentFormState,
+  Mode,
 } from "../assets/types";
-import { sameDay } from "../utils/date";
-import { formatDateForInput } from "../utils/date";
+import { sameDay, formatDateForInput } from "../utils/date";
 import { validateAppointmentForm } from "../utils/validateAppointmentForm";
 
 interface UseAppointmentEditorOptions {
@@ -13,8 +14,10 @@ interface UseAppointmentEditorOptions {
   appointments: Appointment[];
   preselectedContactId: number | null;
   onClearPreselectedContact: () => void;
-  onCreateAppointment: (data: Omit<Appointment, "id">) => Appointment;
-  onUpdateAppointment: (appointment: Appointment) => void;
+  onCreateAppointment: (
+    data: Omit<Appointment, "id">
+  ) => Promise<Appointment>;
+  onUpdateAppointment: (appointment: Appointment) => Promise<void>;
 }
 
 export function useAppointmentEditor({
@@ -79,11 +82,13 @@ export function useAppointmentEditor({
   };
 
   const selectAppointmentForEdit = (a: Appointment) => {
+    const dt = new Date(a.datetime);
+
     setEditingId(a.id);
     setEmailLocked(a.sendEmail === "yes");
     setForm({
-      date: formatDateForInput(new Date(a.datetime)),
-      time: new Date(a.datetime).toLocaleTimeString("de-DE", {
+      date: formatDateForInput(dt),
+      time: dt.toLocaleTimeString("de-DE", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
@@ -96,7 +101,7 @@ export function useAppointmentEditor({
     setMode("edit");
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const nextErrors = validateAppointmentForm(form);
@@ -108,7 +113,7 @@ export function useAppointmentEditor({
     const datetime = new Date(`${form.date}T${form.time}:00`).toISOString();
 
     if (mode === "create") {
-      const appt = onCreateAppointment({
+      const appt = await onCreateAppointment({
         contactId: form.contactId as number,
         datetime,
         type: form.type,
@@ -127,7 +132,7 @@ export function useAppointmentEditor({
         note: form.note.trim() || undefined,
         sendEmail: form.sendEmail,
       };
-      onUpdateAppointment(updated);
+      await onUpdateAppointment(updated);
       setSelectedDate(new Date(updated.datetime));
     }
 

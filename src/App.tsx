@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { ContactsView } from "./components/ContactsView";
 import { AppointmentsView } from "./components/AppointmentsView";
 import type { Appointment, Contact } from "./assets/types";
+
+import {
+  fetchContacts,
+  fetchAppointments,
+  createContact,
+  updateContact,
+  createAppointment,
+  updateAppointment,
+  deleteAppointment,
+} from "./api/appointmentsApi";
 
 function App() {
   const [activeView, setActiveView] = useState<"contacts" | "appointments">(
@@ -12,42 +22,86 @@ function App() {
 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [nextContactId, setNextContactId] = useState(1);
-  const [nextAppointmentId, setNextAppointmentId] = useState(1);
-  const [preselectedContactId, setPreselectedContactId] = useState<  number | null  >(null);
+  const [preselectedContactId, setPreselectedContactId] =
+    useState<number | null>(null);
 
-  const createContact = (data: Omit<Contact, "id">): Contact => {
-    const contact: Contact = { id: nextContactId, ...data };
-    setContacts((prev) => [...prev, contact]);
-    setNextContactId((id) => id + 1);
-    return contact;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [contactsRes, appointmentsRes] = await Promise.all([
+          fetchContacts(),
+          fetchAppointments(),
+        ]);
+        setContacts(contactsRes);
+        setAppointments(appointmentsRes);
+      } catch (err) {
+        console.error(err);
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+
+  const handleCreateContact = async (
+    data: Omit<Contact, "id">
+  ): Promise<Contact> => {
+    const created = await createContact(data);
+    setContacts((prev) => [...prev, created]);
+    return created;
   };
 
-  const createAppointment = (data: Omit<Appointment, "id">): Appointment => {
-    const appt: Appointment = { id: nextAppointmentId, ...data };
-    setAppointments((prev) => [...prev, appt]);
-    setNextAppointmentId((id) => id + 1);
-    return appt;
+  const handleUpdateContact = async (updated: Contact): Promise<void> => {
+    const { id, ...rest } = updated;
+    const saved = await updateContact(id, rest);
+    setContacts((prev) =>
+      prev.map((c) => (c.id === saved.id ? saved : c))
+    );
   };
+
+
+  const handleCreateAppointment = async (
+    data: Omit<Appointment, "id">
+  ): Promise<Appointment> => {
+    const created = await createAppointment(data);
+    setAppointments((prev) => [...prev, created]);
+    return created;
+  };
+
+  const handleUpdateAppointment = async (
+    updated: Appointment
+  ): Promise<void> => {
+    const { id, ...rest } = updated;
+    const saved = await updateAppointment(id, rest);
+    setAppointments((prev) =>
+      prev.map((a) => (a.id === saved.id ? saved : a))
+    );
+  };
+
+  const handleDeleteAppointment = async (id: number): Promise<void> => {
+    await deleteAppointment(id);
+    setAppointments((prev) => prev.filter((a) => a.id !== id));
+  };
+
 
   const handleSelectContactForAppointment = (contact: Contact) => {
     setPreselectedContactId(contact.id);
     setActiveView("appointments");
   };
 
-  const updateContact = (updated: Contact) => {
-    setContacts((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-  };
+  if (loading) {
+    return <div className="app-root">Lade Daten…</div>;
+  }
 
-  const updateAppointment = (updated: Appointment) => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === updated.id ? updated : a))
-    );
-  };
-
-  const deleteAppointment = (id: number) => {
-    setAppointments((prev) => prev.filter((a) => a.id !== id));
-  };
+  if (error) {
+    return <div className="app-root error">{error}</div>;
+  }
 
   return (
     <div className="app-root">
@@ -61,18 +115,18 @@ function App() {
         {activeView === "contacts" ? (
           <ContactsView
             contacts={contacts}
-            onCreateContact={createContact}
-            onUpdateContact={updateContact}
+            onCreateContact={handleCreateContact}
+            onUpdateContact={handleUpdateContact}
             onSelectContactForAppointment={handleSelectContactForAppointment}
           />
         ) : (
           <AppointmentsView
             contacts={contacts}
             appointments={appointments}
-            onCreateAppointment={createAppointment}
-            onUpdateAppointment={updateAppointment}
-            onDeleteAppointment={deleteAppointment}
-            onCreateContactInline={createContact}
+            onCreateAppointment={handleCreateAppointment}
+            onUpdateAppointment={handleUpdateAppointment}
+            onDeleteAppointment={handleDeleteAppointment}
+            onCreateContactInline={handleCreateContact}
             preselectedContactId={preselectedContactId}
             onClearPreselectedContact={() => setPreselectedContactId(null)}
           />
